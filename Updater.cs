@@ -17,8 +17,8 @@ namespace Updater
 {
     public partial class Updater : Form
     {
-        private string updateUrl = "http://osu.ppy.sh/release/";
-        private string backupUpdateUrl = "http://update.ppy.sh/release/";
+        private string backupUpdateUrl = "http://osu.ppy.sh/release/";
+        private string primaryUpdateUrl = "http://update.ppy.sh/release/";
         
         static List<DownloadItem> Extras = new List<DownloadItem>();
         static List<DownloadItem> Files = new List<DownloadItem>();
@@ -26,6 +26,10 @@ namespace Updater
         private int autoStartTick = 0;
         private int filesCompleted = 0;
         private int filesProcessing = 0;
+        private double progress = 0;
+
+        private bool checkedForUpdates = false;
+        private bool extraTabVisible = false;
         
         // https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms537168(v=vs.85)
         [DllImport("urlmon.dll")]
@@ -42,7 +46,7 @@ namespace Updater
             InitializeComponent();
             ConfigManagerCompact.LoadConfig();
             
-            bool extraTabVisible = argument == "-extra";
+            extraTabVisible = argument == "-extra";
             testBuild.Visible = argument == "-test";
             testBuild.Checked = argument == "-test";
 
@@ -95,7 +99,122 @@ namespace Updater
 
         private void OnStatusUpdateTick(object sender, EventArgs e)
         {
-            // TODO: ...
+            try
+			{
+				if (this.extrasCheckBoxList.SelectedItems.Count > 0)
+				{
+					DownloadItem item = (DownloadItem)this.extrasCheckBoxList.Items[
+						this.extrasCheckBoxList.SelectedIndex
+					];
+					
+					if (item == null)
+						return;
+					
+					if (File.Exists(item.Filename + "_new"))
+						File.Delete(item.Filename + "_new");
+					
+					FileNetRequest nr = new FileNetRequest(
+						item.Filename + "_new",
+						primaryUpdateUrl + item.Filename
+					);
+					
+					item.NetRequest = nr;
+					
+					lock (Files)
+						Files.Add(item);
+					
+					nr.onFinish += OnDownloadFinished;
+					nr.onUpdate += OnDownloadUpdated;
+					
+					NetManager.AddRequest(nr);
+					this.filesProcessing++;
+					
+					if (this.extrasCheckBoxList.Items.Contains(item))
+						this.extrasCheckBoxList.Items.Remove(item);
+					
+					this.extrasCheckBoxList.SelectedItems.Clear();
+				}
+				if (this.filesProcessing == this.filesCompleted)
+				{
+					if (!checkedForUpdates)
+					{
+						this.statusText.Text = "Checking for updates...";
+						this.buttonStart.Visible = false;
+					}
+					else
+					{
+						if (this.statusText.Text != "All done!")
+						{
+							this.statusText.Text = "All done!";
+							this.buttonStart.Visible = true;
+							this.filesCompleted = 0;
+							this.filesProcessing = 0;
+							
+							if (File.Exists("osu!test.exe"))
+								this.testBuild.Text = "Use test build";
+							
+							this.buttonStart.Focus();
+						}
+						if (
+							autoStart.Checked &&
+							extrasTabWrapper.SelectedIndex != 1 &&
+							!extraTabVisible &&
+							autoStartTick++ > 10
+						)
+							StartGame();
+					}
+				}
+				else
+				{
+					lock (Files)
+					{
+						if (Files.Count <= 0)
+							return;
+						
+						buttonStart.Visible = false;
+						if (Files[0].Patching)
+						{
+							this.statusText.Text = string.Format(
+								"Patching {0}... {1:0}%",
+								Files[0].Filename,
+								Files[0].Progress
+							);
+						}
+						else
+						{
+							this.statusText.Text = string.Format(
+								"Downloading {3} {2:0}%", new object[]
+								{
+									this.filesCompleted + 1,
+									this.filesProcessing,
+									Files[0].Progress,
+									Files[0].Filename
+								}
+							);
+						}
+						
+						progressBar.Style = ProgressBarStyle.Continuous;
+						int newProgress = (int)Files[0].Progress;
+
+						if (newProgress >= 0 && newProgress <= 100)
+							progressBar.Value = newProgress;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString());
+			}
+        }
+
+        private void OnDownloadFinished(string location, Exception e)
+        {
+	        // TODO
+        }
+
+        private void OnDownloadUpdated(object object_0, long long_0, long long_1)
+        {
+	        // TODO
         }
 
         private void OnBrowserNavigating(object sender, WebBrowserNavigatingEventArgs e)
