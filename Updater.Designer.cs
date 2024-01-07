@@ -53,8 +53,8 @@ namespace Updater
 			this.statusText = new TextBox();
 			this.checkBoxWrapper = new Panel();
 			this.checkBoxPanel = new Panel();
-			this.autoStartCheckBox = new CheckBox();
-			this.testBuildCheckBox = new CheckBox();
+			this.autoStart = new CheckBox();
+			this.testBuild = new CheckBox();
 			this.tabWrapper = new TabControl();
 			this.changelogTab = new TabPage();
 			this.extrasTab = new TabPage();
@@ -151,29 +151,29 @@ namespace Updater
 			this.checkBoxWrapper.Size = new Size(494, 365);
 			this.checkBoxWrapper.TabIndex = 5;
 			
-			this.checkBoxPanel.Controls.Add(this.autoStartCheckBox);
-			this.checkBoxPanel.Controls.Add(this.testBuildCheckBox);
+			this.checkBoxPanel.Controls.Add(this.autoStart);
+			this.checkBoxPanel.Controls.Add(this.testBuild);
 			this.checkBoxPanel.Dock = DockStyle.Bottom;
 			this.checkBoxPanel.Location = new Point(0, 316);
 			this.checkBoxPanel.Name = "checkBoxPanel";
 			this.checkBoxPanel.Size = new Size(494, 49);
 			this.checkBoxPanel.TabIndex = 10;
 			
-			this.autoStartCheckBox.Location = new Point(12, 14);
-			this.autoStartCheckBox.Name = "autoStart";
-			this.autoStartCheckBox.Size = new Size(243, 19);
-			this.autoStartCheckBox.TabIndex = 7;
-			this.autoStartCheckBox.Text = "Automatically start osu! after updating";
-			this.autoStartCheckBox.UseVisualStyleBackColor = true;
-			this.autoStartCheckBox.CheckedChanged += this.OnAutoStartToggled;
-			this.testBuildCheckBox.Location = new Point(328, 14);
-			this.testBuildCheckBox.Name = "testBuild";
-			this.testBuildCheckBox.Size = new Size(154, 19);
-			this.testBuildCheckBox.TabIndex = 9;
-			this.testBuildCheckBox.Text = "Use test build";
-			this.testBuildCheckBox.UseVisualStyleBackColor = true;
-			this.testBuildCheckBox.Visible = false;
-			this.testBuildCheckBox.CheckedChanged += this.OnTestBuildToggled;
+			this.autoStart.Location = new Point(12, 14);
+			this.autoStart.Name = "autoStart";
+			this.autoStart.Size = new Size(243, 19);
+			this.autoStart.TabIndex = 7;
+			this.autoStart.Text = "Automatically start osu! after updating";
+			this.autoStart.UseVisualStyleBackColor = true;
+			this.autoStart.CheckedChanged += this.OnAutoStartToggled;
+			this.testBuild.Location = new Point(328, 14);
+			this.testBuild.Name = "testBuild";
+			this.testBuild.Size = new Size(154, 19);
+			this.testBuild.TabIndex = 9;
+			this.testBuild.Text = "Use test build";
+			this.testBuild.UseVisualStyleBackColor = true;
+			this.testBuild.Visible = false;
+			this.testBuild.CheckedChanged += this.OnTestBuildToggled;
 			
 			this.tabWrapper.Controls.Add(this.changelogTab);
 			this.tabWrapper.Controls.Add(this.extrasTab);
@@ -278,7 +278,7 @@ namespace Updater
         private System.Windows.Forms.WebBrowser changelogBrowser;
         private System.Windows.Forms.Panel bottomPanel;
         private System.Windows.Forms.TextBox statusText;
-        private System.Windows.Forms.CheckBox autoStartCheckBox;
+        private System.Windows.Forms.CheckBox autoStart;
         private System.Windows.Forms.TabControl tabWrapper;
         private System.Windows.Forms.TabPage changelogTab;
         private System.Windows.Forms.CheckedListBox extrasCheckBoxList;
@@ -287,6 +287,6 @@ namespace Updater
         private System.Windows.Forms.TextBox packagesTextBox;
         private System.ComponentModel.BackgroundWorker bgWorker;
         private System.Windows.Forms.Panel checkBoxPanel;
-        private System.Windows.Forms.CheckBox testBuildCheckBox;
+        private System.Windows.Forms.CheckBox testBuild;
     }
 }
