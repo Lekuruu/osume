@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using ICSharpCode.SharpZipLib.Zip;
 using osu_common.Helpers;
 using osu_common.Libraries;
 using osu_common.Libraries.NetLib;
@@ -66,6 +67,36 @@ namespace Updater
             ConfigManagerCompact.SaveConfig();
             Process.Start(testBuild.Checked ? "osu!test.exe" : "osu!.exe");
             Application.Exit();
+        }
+
+        private void MoveFile(string sourcePath, string dstPath)
+        {
+	        int retries = 5;
+	        
+	        while (retries-- > 0)
+	        {
+		        try { File.Delete(dstPath); }
+		        catch { }
+		        
+		        try 
+		        {
+			        File.Move(sourcePath, dstPath);
+			        return;
+		        }
+		        catch
+		        {
+			        try
+			        {
+				        File.Copy(sourcePath, dstPath, true);
+				        File.Delete(sourcePath);
+				        return;
+			        }
+			        catch { }
+		        }
+		        Thread.Sleep(600);
+	        }
+	        MessageBox.Show("Unable to relpace file " + dstPath + ". Please check this file isn't still open then try running the updater again.");
+	        Environment.Exit(-1);
         }
 
         private void OnLoad(object sender, EventArgs e)
