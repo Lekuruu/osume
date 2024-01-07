@@ -225,7 +225,7 @@ namespace Updater
 			this.extrasCheckBoxList.Size = new Size(480, 254);
 			this.extrasCheckBoxList.TabIndex = 5;
 			
-			this.statusUpdater.Tick += this.OnStatusUpdate;
+			this.statusUpdater.Tick += this.OnStatusUpdateTick;
 			this.bgWorker.DoWork += (object sender, DoWorkEventArgs e) =>
 			{
 				this.CheckUpdates();

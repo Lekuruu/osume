@@ -21,6 +21,10 @@ namespace Updater
         private string updateUrl = "http://osu.ppy.sh/release/";
         private string backupUpdateUrl = "http://update.ppy.sh/release/";
         
+        private int autoStartTick = 0;
+        private int filesCompleted = 0;
+        private int filesProcessing = 0;
+        
         // https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms537168(v=vs.85)
         [DllImport("urlmon.dll")]
         [PreserveSig]
@@ -49,6 +53,13 @@ namespace Updater
         public void CheckUpdates()
         {
             // TODO: ...
+        }
+
+        public void StartGame()
+        {
+            ConfigManagerCompact.SaveConfig();
+            Process.Start(testBuild.Checked ? "osu!test.exe" : "osu!.exe");
+            Application.Exit();
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -80,7 +91,7 @@ namespace Updater
             ConfigManagerCompact.SaveConfig();
         }
 
-        private void OnStatusUpdate(object sender, EventArgs e)
+        private void OnStatusUpdateTick(object sender, EventArgs e)
         {
             // TODO: ...
         }
@@ -96,14 +107,13 @@ namespace Updater
 
         private void OnStartButtonClick(object sender, EventArgs e)
         {
-            ConfigManagerCompact.SaveConfig();
-            Process.Start(testBuild.Checked ? "osu!test.exe" : "osu!.exe");
-            Application.Exit();
+            StartGame();
         }
 
         private void OnAutoStartToggled(object sender, EventArgs e)
         {
-            // TODO: ...
+            autoStartTick = 0;
+            ConfigManagerCompact.Configuration["u_UpdaterAutoStart"] = (autoStart.Checked ? "1" : "0");
         }
 
         private void OnTestBuildToggled(object sender, EventArgs e)
