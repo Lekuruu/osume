@@ -262,12 +262,107 @@ namespace Updater
 
         private void OnDownloadFinished(string location, Exception e)
         {
-	        // TODO
+	        string filename = location.Replace("_new", "");
+	        
+	        DownloadItem item = Files.Find(i => i.Filename == filename);
+
+	        if (e != null)
+	        {
+		        if (item.NetRequest.m_url.Contains(primaryUpdateUrl))
+		        {
+			        item.NetRequest.m_url = item.NetRequest.m_url.Replace(primaryUpdateUrl, backupUpdateUrl);
+			        return;
+		        }
+	        
+		        MessageBox.Show(
+			        string.Format(
+				        "An error was encountered while downloading the file: {0}\n\nPlease restart the updater and report this error.\n{1}",
+				        location, e.ToString()
+			        )
+		        );
+		        return;
+	        }
+
+	        try
+	        {
+		        if (item == null)
+		        {
+			        MessageBox.Show(
+				        string.Format(
+					        "Internal error on file:{0}\n\nPlease restart the updater and report this error.",
+					        filename
+				        )
+			        );
+		        }
+		        else
+		        {
+			        if (File.Exists(filename))
+				        File.Delete(filename);
+
+			        MoveFile(location, filename);
+
+			        if (Path.GetExtension(filename) == ".zip")
+			        {
+				        if (File.Exists(item.CheckFilename))
+					        File.Delete(item.CheckFilename);
+
+				        new FastZip().ExtractZip(
+					        filename,
+					        ".\\",
+					        FastZip.Overwrite.Always,
+					        null,
+					        ".*",
+					        ".*",
+					        false
+				        );
+
+				        File.Delete(filename);
+			        }
+
+			        if (filename == "_osume.exe")
+			        {
+				        Process.Start("_osume.exe");
+				        Application.Exit();
+			        }
+			        else
+			        {
+				        ConfigManagerCompact.Configuration["h_" + filename] = GetMd5(filename);
+
+				        lock (Files)
+					        Files.Remove(item);
+
+				        this.filesCompleted++;
+			        }
+		        }
+	        }
+	        catch (Exception ex)
+	        {
+		        MessageBox.Show(
+			        string.Format(
+				        "An error was encountered while downloading the file:{0}\n\nPlease report this error:\n{1}",
+				        location,
+				        ex
+			        )
+		        );
+	        }
         }
 
-        private void OnDownloadUpdated(object object_0, long long_0, long long_1)
+        private void OnDownloadUpdated(object sender, long current, long total)
         {
-	        // TODO
+	        try
+	        {
+		        DownloadItem item = Files.Find(i => i.NetRequest == sender);
+
+		        if (item != null)
+		        {
+			        progress = (float)current / total * 100;
+			        item.Progress = progress;
+		        }
+	        }
+	        catch (Exception ex)
+	        {
+		        MessageBox.Show("Error\n" + ex);
+	        }
         }
 
         private void OnBrowserNavigating(object sender, WebBrowserNavigatingEventArgs e)
