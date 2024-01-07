@@ -21,11 +21,16 @@ namespace Updater
         public Updater(string argument)
         {
             InitializeComponent();
-            
             ConfigManagerCompact.LoadConfig();
-            bool extraTabVisible = argument == "-extra";
             
-            // TODO: ...
+            bool extraTabVisible = argument == "-extra";
+            testBuild.Visible = argument == "-test";
+            testBuild.Checked = argument == "-test";
+
+            if (extraTabVisible)
+            {
+                this.extrasTabWrapper.SelectTab(1);
+            }
         }
         
         public void CheckUpdates()

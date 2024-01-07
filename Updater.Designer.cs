@@ -55,7 +55,7 @@ namespace Updater
 			this.checkBoxPanel = new Panel();
 			this.autoStart = new CheckBox();
 			this.testBuild = new CheckBox();
-			this.tabWrapper = new TabControl();
+			this.extrasTabWrapper = new TabControl();
 			this.changelogTab = new TabPage();
 			this.extrasTab = new TabPage();
 			this.packagesTextBox = new TextBox();
@@ -68,7 +68,7 @@ namespace Updater
 			this.bottomPanel.SuspendLayout();
 			this.checkBoxWrapper.SuspendLayout();
 			this.checkBoxPanel.SuspendLayout();
-			this.tabWrapper.SuspendLayout();
+			this.extrasTabWrapper.SuspendLayout();
 			this.changelogTab.SuspendLayout();
 			this.extrasTab.SuspendLayout();
 			this.SuspendLayout();
@@ -144,7 +144,7 @@ namespace Updater
 			this.statusText.WordWrap = false;
 			
 			this.checkBoxWrapper.Controls.Add(this.checkBoxPanel);
-			this.checkBoxWrapper.Controls.Add(this.tabWrapper);
+			this.checkBoxWrapper.Controls.Add(this.extrasTabWrapper);
 			this.checkBoxWrapper.Dock = DockStyle.Fill;
 			this.checkBoxWrapper.Location = new Point(0, 0);
 			this.checkBoxWrapper.Name = "checkBoxWrapper";
@@ -175,15 +175,15 @@ namespace Updater
 			this.testBuild.Visible = false;
 			this.testBuild.CheckedChanged += this.OnTestBuildToggled;
 			
-			this.tabWrapper.Controls.Add(this.changelogTab);
-			this.tabWrapper.Controls.Add(this.extrasTab);
-			this.tabWrapper.Dock = DockStyle.Top;
-			this.tabWrapper.Enabled = false;
-			this.tabWrapper.Location = new Point(0, 0);
-			this.tabWrapper.Name = "tabWrapper";
-			this.tabWrapper.SelectedIndex = 0;
-			this.tabWrapper.Size = new Size(494, 310);
-			this.tabWrapper.TabIndex = 8;
+			this.extrasTabWrapper.Controls.Add(this.changelogTab);
+			this.extrasTabWrapper.Controls.Add(this.extrasTab);
+			this.extrasTabWrapper.Dock = DockStyle.Top;
+			this.extrasTabWrapper.Enabled = false;
+			this.extrasTabWrapper.Location = new Point(0, 0);
+			this.extrasTabWrapper.Name = "extrasTabWrapper";
+			this.extrasTabWrapper.SelectedIndex = 0;
+			this.extrasTabWrapper.Size = new Size(494, 310);
+			this.extrasTabWrapper.TabIndex = 8;
 			
 			this.changelogTab.Controls.Add(this.changelogBrowser);
 			this.changelogTab.Location = new Point(4, 22);
@@ -261,7 +261,7 @@ namespace Updater
 			this.bottomPanel.ResumeLayout(false);
 			this.checkBoxWrapper.ResumeLayout(false);
 			this.checkBoxPanel.ResumeLayout(false);
-			this.tabWrapper.ResumeLayout(false);
+			this.extrasTabWrapper.ResumeLayout(false);
 			this.changelogTab.ResumeLayout(false);
 			this.extrasTab.ResumeLayout(false);
 			this.extrasTab.PerformLayout();
@@ -279,7 +279,7 @@ namespace Updater
         private System.Windows.Forms.Panel bottomPanel;
         private System.Windows.Forms.TextBox statusText;
         private System.Windows.Forms.CheckBox autoStart;
-        private System.Windows.Forms.TabControl tabWrapper;
+        private System.Windows.Forms.TabControl extrasTabWrapper;
         private System.Windows.Forms.TabPage changelogTab;
         private System.Windows.Forms.CheckedListBox extrasCheckBoxList;
         private System.Windows.Forms.TabPage extrasTab;
