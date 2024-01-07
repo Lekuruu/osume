@@ -18,6 +18,19 @@ namespace Updater
 {
     public partial class Updater : Form
     {
+        private string updateUrl = "http://osu.ppy.sh/release/";
+        private string backupUpdateUrl = "http://update.ppy.sh/release/";
+        
+        // https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/platform-apis/ms537168(v=vs.85)
+        [DllImport("urlmon.dll")]
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.Error)]
+        static extern int CoInternetSetFeatureEnabled(
+            int featureEntry, 
+            [MarshalAs(UnmanagedType.U4)] int dwFlags,
+            bool fEnable
+        );
+        
         public Updater(string argument)
         {
             InitializeComponent();
@@ -40,12 +53,31 @@ namespace Updater
 
         private void OnLoad(object sender, EventArgs e)
         {
-            // TODO: ...
+            this.progressBar.Style = ProgressBarStyle.Marquee;
+            this.extrasCheckBoxList.Sorted = true;
+            
+            if (!File.Exists("osu!test.exe"))
+            {
+                this.testBuild.Text = "Download and use test build (supporters only)";
+                if (ConfigManagerCompact.Configuration.ContainsKey("u_UpdaterTestBuild"))
+                {
+                    ConfigManagerCompact.Configuration.Remove("u_UpdaterTestBuild");
+                }
+                this.testBuild.Enabled = false;
+            }
+            
+            CoInternetSetFeatureEnabled(
+                21, // FEATURE_DISABLE_NAVIGATION_SOUNDS
+                2, // SET_FEATURE_ON_PROCESS
+                true
+            );
+            
+            this.bgWorker.RunWorkerAsync();
         }
 
         private void OnClose(object sender, FormClosingEventArgs e)
         {
-            // TODO: ...
+            ConfigManagerCompact.SaveConfig();
         }
 
         private void OnStatusUpdate(object sender, EventArgs e)
