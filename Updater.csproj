@@ -35,7 +35,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="osu!common">
-          <HintPath>osu!common.dll</HintPath>
+          <HintPath>Dependencies\osu!common.dll</HintPath>
         </Reference>
         <Reference Include="System"/>
         <Reference Include="System.Core"/>
