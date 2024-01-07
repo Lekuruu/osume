@@ -9,7 +9,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using osu_common.Updater;
 using osu_common.Helpers;
 using osu_common.Libraries;
 using osu_common.Libraries.NetLib;
@@ -20,6 +19,9 @@ namespace Updater
     {
         private string updateUrl = "http://osu.ppy.sh/release/";
         private string backupUpdateUrl = "http://update.ppy.sh/release/";
+        
+        static List<DownloadItem> Extras = new List<DownloadItem>();
+        static List<DownloadItem> Files = new List<DownloadItem>();
         
         private int autoStartTick = 0;
         private int filesCompleted = 0;
@@ -118,7 +120,44 @@ namespace Updater
 
         private void OnTestBuildToggled(object sender, EventArgs e)
         {
-            // TODO: ...
+            if (testBuild.Checked && !File.Exists("osu!test.exe"))
+            {
+                DownloadItem item = Extras.Find(i => i.CheckFilename == "osu!test.exe");
+                
+                if (item == null)
+                {
+                    testBuild.Checked = false;
+                    return;
+                }
+
+                if (extrasCheckBoxList.Items.IndexOf(item) < 0)
+                    return;
+
+                extrasCheckBoxList.SelectedItems.Add(item);
+            }
+
+            ConfigManagerCompact.Configuration["u_UpdaterTestBuild"] = (testBuild.Checked ? "1" : "0");
+            changelogBrowser.Navigate("http://osu.ppy.sh/p/changelog?updater=" + (testBuild.Checked ? "2" : "1"));
+        }
+        
+        private class DownloadItem
+        {
+            public readonly string CheckFilename;
+            public readonly string DisplayName;
+            public readonly string Filename;
+            public NetRequest NetRequest;
+            public double Progress;
+            public bool Patching;
+
+            public DownloadItem(NetRequest nr, string filename, string displayName, string checkFilename)
+            {
+                this.DisplayName = displayName;
+                this.Filename = filename;
+                this.CheckFilename = checkFilename;
+                this.NetRequest = nr;
+            }
+
+            public override string ToString() => this.DisplayName;
         }
     }
 }
