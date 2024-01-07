@@ -56,7 +56,7 @@ namespace Updater
                 this.extrasTabWrapper.SelectTab(1);
             }
         }
-        
+
         public void CheckUpdates()
         {
             // TODO: ...
@@ -68,7 +68,7 @@ namespace Updater
             Process.Start(testBuild.Checked ? "osu!test.exe" : "osu!.exe");
             Application.Exit();
         }
-
+        
         private void MoveFile(string sourcePath, string dstPath)
         {
 	        int retries = 5;
@@ -97,6 +97,28 @@ namespace Updater
 	        }
 	        MessageBox.Show("Unable to relpace file " + dstPath + ". Please check this file isn't still open then try running the updater again.");
 	        Environment.Exit(-1);
+        }
+
+        private string GetMd5(string filepath)
+        {
+	        try
+	        {
+		        Stream stream = File.Open(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+		        MD5 md5 = MD5.Create();
+		        byte[] array = md5.ComputeHash(stream);
+		        StringBuilder sb = new StringBuilder();
+		        for (int i = 0; i < array.Length; i++)
+		        {
+			        sb.Append(array[i].ToString("x2"));
+		        }
+		        stream.Close();
+		        return sb.ToString();
+	        }
+	        catch (Exception ex)
+	        {
+		        MessageBox.Show("Error\n" + ex);
+		        return "fail";
+	        }
         }
 
         private void OnLoad(object sender, EventArgs e)
