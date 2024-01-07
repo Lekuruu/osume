@@ -96,7 +96,9 @@ namespace Updater
 
         private void OnStartButtonClick(object sender, EventArgs e)
         {
-            // TODO: ...
+            ConfigManagerCompact.SaveConfig();
+            Process.Start(testBuild.Checked ? "osu!test.exe" : "osu!.exe");
+            Application.Exit();
         }
 
         private void OnAutoStartToggled(object sender, EventArgs e)
