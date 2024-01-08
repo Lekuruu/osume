@@ -1,3 +1,4 @@
 # osume
 
-This is still a work in progress. I don't know if I will ever finish this.
+A work in progress decompilation/remake of the old osu! Updater: "osume".
+I don't know if I will ever finish this.
