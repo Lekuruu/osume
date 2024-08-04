@@ -254,25 +254,25 @@ namespace Updater
                                     if (File.Exists(remoteFile.Replace('/', '\\') + "_new"))
                                         File.Delete(remoteFile.Replace('/', '\\') + "_new");
                                     
-                                    Class23 class6 = new Class23(remoteFile.Replace('/', '\\') + "_new", string_1 + remoteFile + "?v=" + remoteChecksum);
-                                    lock (list_0)
-                                    {
-                                        list_0.Add(new Class96(class6, remoteFile.Replace('/', '\\'), description, localFilename));
-                                    }
-                                    int_2++;
-                                    class6.method_1(method_4);
-                                    class6.method_0(method_3);
-                                    string empty = string.Empty;
+                                    FileNetRequest netRequest = new FileNetRequest(remoteFile.Replace('/', '\\') + "_new", backupUpdateUrl + remoteFile + "?v=" + remoteChecksum);
+                                    
+                                    lock (Files)
+                                        Files.Add(new DownloadItem(netRequest, remoteFile.Replace('/', '\\'), description, localFilename));
+                                    
+                                    filesProcessing++;
+                                    netRequest.onFinish += OnDownloadFinished;
+                                    netRequest.onUpdate += OnDownloadUpdated;
+                                    
+                                    string previousUrl = string.Empty;
                                     do
                                     {
-                                        empty = class6.string_0;
-                                        class6.vmethod_0();
+                                        previousUrl = netRequest.m_url;
+                                        netRequest.Perform();
                                     }
-                                    while (class6.string_0 != empty);
+                                    while (netRequest.m_url != previousUrl);
+                                    
                                     if (remoteFile == "_osume.exe")
-                                    {
                                         break;
-                                    }
                                 }
                             }
                         }
