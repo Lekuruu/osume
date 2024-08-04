@@ -80,12 +80,13 @@ namespace Updater
 
             if (Program.KillProcess("osu!") && (!File.Exists("osu!test.exe") || Program.KillProcess("osu!test")))
             {
-                Invoke(new MethodInvoker(method_11));
-                string text;
+                Invoke(delegate { Enabled = true; });
+                
+                string response;
                 try
                 {
-                    Class24 @class = new Class24(string_0 + "update?time=" + DateTime.Now.Ticks);
-                    text = @class.method_0();
+                    StringNetRequest request = new StringNetRequest(backupUpdateUrl + "update?time=" + DateTime.Now.Ticks);
+                    response = request.BlockingPerform();
                 }
                 catch (Exception ex)
                 {
@@ -93,13 +94,13 @@ namespace Updater
                     return;
                 }
                 
-                if (text.Length != 0)
+                if (response.Length != 0)
                 {
                     try
                     {
                         Delegate0 @delegate = method_12;
                         ((Control)this).Invoke((Delegate)@delegate);
-                        string[] array = text.Split(new char[1] { '\n' });
+                        string[] array = response.Split(new char[1] { '\n' });
                         string[] array2 = array;
                         foreach (string text2 in array2)
                         {
