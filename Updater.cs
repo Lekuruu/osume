@@ -143,123 +143,125 @@ namespace Updater
                                                     File.Delete(remoteFile);
                                                 }
                                                 break;
+                                        } 
                                     }
+                                    
+                                    if (isExtra)
+                                        continue;
                                 }
-                                if (isExtra)
-                                    continue;
-                            }
                                 
-                            bool flag3 = File.Exists(localFilename);
-                            string text5 = lineContents[1];
-                            class2.string_0 = (flag3 ? smethod_0(localFilename) : string.Empty);
-                            if (!flag3 || !(class2.string_0 == text5))
-                            {
-                                if (flag3 && isDiff)
+                                bool localFileExists = File.Exists(localFilename);
+                                string remoteChecksum = lineContents[1];
+                                string localChecksum = GetMd5Cached(localFilename);
+                                
+                                if (!localFileExists || localChecksum != remoteChecksum)
                                 {
-                                    try
+                                    if (localFileExists && isDiff)
                                     {
-                                        int num = 1;
-                                        if (list_1 == null)
+                                        try
                                         {
-                                            Class24 class3 = new Class24(string_0 + "patches.php");
-                                            list_1 = new List<string>(class3.method_0().Split(new char[1] { '\n' }));
-                                        }
-                                        if (list_1.Count > 0)
-                                        {
-                                            while (class2.string_0 != text5)
+                                            int num = 1;
+                                            if (list_1 == null)
                                             {
-                                                string text6 = list_1.Find(class2.method_0);
-                                                if (text6 == null)
+                                                Class24 class3 = new Class24(string_0 + "patches.php");
+                                                list_1 = new List<string>(class3.method_0().Split(new char[1] { '\n' }));
+                                            }
+                                            if (list_1.Count > 0)
+                                            {
+                                                while (class2.string_0 != remoteChecksum)
                                                 {
-                                                    break;
-                                                }
-                                                Class98 class4 = new Class98();
-                                                class4.class97_0 = class2;
-                                                class4.updater_0 = this;
-                                                string text7 = localFilename + "_patch";
-                                                class4.class23_0 = new Class23(text7, string_1 + text6);
-                                                class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + num++ + ")", description, localFilename);
-                                                lock (list_0)
-                                                {
-                                                    list_0.Add(class4.class96_0);
-                                                }
-                                                int_2++;
-                                                class4.class23_0.method_0(method_3);
-                                                class4.class23_0.method_1(class4.method_0);
-                                                int num2 = 3;
-                                                while (num2-- > 0)
-                                                {
-                                                    class4.class23_0.vmethod_0();
-                                                    if (File.Exists(text7))
+                                                    string text6 = list_1.Find(class2.method_0);
+                                                    if (text6 == null)
                                                     {
                                                         break;
                                                     }
-                                                    Thread.Sleep(1000);
-                                                }
-                                                if (!File.Exists(text7))
-                                                {
-                                                    MessageBox.Show("Unable to download " + text7 + ". Please check your connection and/or try again later");
-                                                }
-                                                class4.class96_0.bool_0 = true;
-                                                class4.class96_0.double_0 = 0.0;
-                                                Class5 class5 = new Class5();
-                                                class5.method_0(class4.method_1);
-                                                class5.method_1(localFilename, localFilename + "_new", text7, Enum1.const_1);
-                                                File.Delete(text7);
-                                                class2.string_0 = smethod_1(localFilename + "_new");
-                                                if (!text6.Contains(class2.string_0))
-                                                {
+                                                    Class98 class4 = new Class98();
+                                                    class4.class97_0 = class2;
+                                                    class4.updater_0 = this;
+                                                    string text7 = localFilename + "_patch";
+                                                    class4.class23_0 = new Class23(text7, string_1 + text6);
+                                                    class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + num++ + ")", description, localFilename);
+                                                    lock (list_0)
+                                                    {
+                                                        list_0.Add(class4.class96_0);
+                                                    }
+                                                    int_2++;
+                                                    class4.class23_0.method_0(method_3);
+                                                    class4.class23_0.method_1(class4.method_0);
+                                                    int num2 = 3;
+                                                    while (num2-- > 0)
+                                                    {
+                                                        class4.class23_0.vmethod_0();
+                                                        if (File.Exists(text7))
+                                                        {
+                                                            break;
+                                                        }
+                                                        Thread.Sleep(1000);
+                                                    }
+                                                    if (!File.Exists(text7))
+                                                    {
+                                                        MessageBox.Show("Unable to download " + text7 + ". Please check your connection and/or try again later");
+                                                    }
+                                                    class4.class96_0.bool_0 = true;
+                                                    class4.class96_0.double_0 = 0.0;
+                                                    Class5 class5 = new Class5();
+                                                    class5.method_0(class4.method_1);
+                                                    class5.method_1(localFilename, localFilename + "_new", text7, Enum1.const_1);
+                                                    File.Delete(text7);
+                                                    class2.string_0 = smethod_1(localFilename + "_new");
+                                                    if (!text6.Contains(class2.string_0))
+                                                    {
+                                                        lock (list_0)
+                                                        {
+                                                            list_0.Remove(class4.class96_0);
+                                                        }
+                                                        int_1++;
+                                                        break;
+                                                    }
+                                                    File.Delete(localFilename + "_diff");
+                                                    method_2(localFilename + "_new", localFilename);
                                                     lock (list_0)
                                                     {
                                                         list_0.Remove(class4.class96_0);
                                                     }
                                                     int_1++;
-                                                    break;
                                                 }
-                                                File.Delete(localFilename + "_diff");
-                                                method_2(localFilename + "_new", localFilename);
-                                                lock (list_0)
+                                                if (class2.string_0 == remoteChecksum)
                                                 {
-                                                    list_0.Remove(class4.class96_0);
+                                                    Class6.dictionary_0["h_" + localFilename] = class2.string_0;
+                                                    continue;
                                                 }
-                                                int_1++;
-                                            }
-                                            if (class2.string_0 == text5)
-                                            {
-                                                Class6.dictionary_0["h_" + localFilename] = class2.string_0;
-                                                continue;
                                             }
                                         }
+                                        catch (Exception ex2)
+                                        {
+                                            MessageBox.Show("error occured: " + ex2);
+                                        }
                                     }
-                                    catch (Exception ex2)
+                                    if (File.Exists(remoteFile.Replace('/', '\\') + "_new"))
                                     {
-                                        MessageBox.Show("error occured: " + ex2);
+                                        File.Delete(remoteFile.Replace('/', '\\') + "_new");
+                                    }
+                                    Class23 class6 = new Class23(remoteFile.Replace('/', '\\') + "_new", string_1 + remoteFile + "?v=" + remoteChecksum);
+                                    lock (list_0)
+                                    {
+                                        list_0.Add(new Class96(class6, remoteFile.Replace('/', '\\'), description, localFilename));
+                                    }
+                                    int_2++;
+                                    class6.method_1(method_4);
+                                    class6.method_0(method_3);
+                                    string empty = string.Empty;
+                                    do
+                                    {
+                                        empty = class6.string_0;
+                                        class6.vmethod_0();
+                                    }
+                                    while (class6.string_0 != empty);
+                                    if (remoteFile == "_osume.exe")
+                                    {
+                                        break;
                                     }
                                 }
-                                if (File.Exists(remoteFile.Replace('/', '\\') + "_new"))
-                                {
-                                    File.Delete(remoteFile.Replace('/', '\\') + "_new");
-                                }
-                                Class23 class6 = new Class23(remoteFile.Replace('/', '\\') + "_new", string_1 + remoteFile + "?v=" + text5);
-                                lock (list_0)
-                                {
-                                    list_0.Add(new Class96(class6, remoteFile.Replace('/', '\\'), description, localFilename));
-                                }
-                                int_2++;
-                                class6.method_1(method_4);
-                                class6.method_0(method_3);
-                                string empty = string.Empty;
-                                do
-                                {
-                                    empty = class6.string_0;
-                                    class6.vmethod_0();
-                                }
-                                while (class6.string_0 != empty);
-                                if (remoteFile == "_osume.exe")
-                                {
-                                    break;
-                                }
-                            }
                         }
                     }
                     bool_0 = true;
@@ -318,6 +320,22 @@ namespace Updater
             }
             MessageBox.Show("Unable to relpace file " + dstPath + ". Please check this file isn't still open then try running the updater again.");
             Environment.Exit(-1);
+        }
+
+        private static string GetMd5Cached(string filename)
+        {
+            try
+            {
+                if (!ConfigManagerCompact.Configuration.ContainsKey("h_" + filename))
+                    ConfigManagerCompact.Configuration["h_" + filename] = GetMd5(filename);
+
+                return ConfigManagerCompact.Configuration["h_" + filename]; 
+            }
+            catch
+            {
+                MessageBox.Show("Error getting Md5sum of file " + filename);
+                return "fail";
+            }
         }
 
         private string GetMd5(string filepath)
