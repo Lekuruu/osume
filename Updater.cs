@@ -19,8 +19,8 @@ namespace Updater
 {
     public partial class Updater : FormHelper
     {
-        private string backupUpdateUrl = "http://osu.ppy.sh/release/";
-        private string primaryUpdateUrl = "http://update.ppy.sh/release/";
+        private string primaryUpdateUrl = "http://osu.ppy.sh/release/";
+        private string backupUpdateUrl = "http://update.ppy.sh/release/";
         
         static List<DownloadItem> Extras = new List<DownloadItem>();
         static List<DownloadItem> Files = new List<DownloadItem>();
@@ -92,6 +92,7 @@ namespace Updater
                     MessageBox.Show("An error occurred retrieving the latest update information:\n" + ex);
                     return;
                 }
+                
                 if (text.Length != 0)
                 {
                     try
@@ -394,7 +395,7 @@ namespace Updater
 
                     FileNetRequest nr = new FileNetRequest(
                         item.Filename + "_new",
-                        primaryUpdateUrl + item.Filename
+                        backupUpdateUrl + item.Filename
                     );
 
                     item.NetRequest = nr;
@@ -494,9 +495,9 @@ namespace Updater
 
             if (e != null)
             {
-                if (item.NetRequest.m_url.Contains(primaryUpdateUrl))
+                if (item.NetRequest.m_url.Contains(backupUpdateUrl))
                 {
-                    item.NetRequest.m_url = item.NetRequest.m_url.Replace(primaryUpdateUrl, backupUpdateUrl);
+                    item.NetRequest.m_url = item.NetRequest.m_url.Replace(backupUpdateUrl, primaryUpdateUrl);
                     return;
                 }
 
