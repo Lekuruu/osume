@@ -180,10 +180,10 @@ namespace Updater
                                                     
                                                     string patchFilename = localFilename + "_patch";
                                                     FileNetRequest request = new FileNetRequest(patchFilename, backupUpdateUrl + patchFile);
-                                                    DownloadItem item = new DownloadItem(request, patchFilename + " (" + index++ + ")", description, localFilename);
+                                                    DownloadItem downloadItem = new DownloadItem(request, patchFilename + " (" + index++ + ")", description, localFilename);
                                                     
                                                     lock (Files)
-                                                        Files.Add(item);
+                                                        Files.Add(downloadItem);
                                                     
                                                     filesProcessing++;
                                                     request.onUpdate += OnDownloadUpdated;
@@ -209,47 +209,53 @@ namespace Updater
                                                         MessageBox.Show("Unable to download " + patchFilename + ". Please check your connection and/or try again later");
                                                     }
                                                     
-                                                    item.Patching = true;
-                                                    item.Progress = 0.0;
-                                                    
-                                                    Class5 class5 = new Class5();
-                                                    class5.method_0(class4.method_1);
-                                                    class5.method_1(localFilename, localFilename + "_new", patchFilename, Enum1.const_1);
-                                                    File.Delete(patchFilename);
-                                                    class2.string_0 = smethod_1(localFilename + "_new");
-                                                    if (!patchFile.Contains(class2.string_0))
+                                                    downloadItem.Patching = true;
+                                                    downloadItem.Progress = 0.0;
+
+                                                    BSPatcher patcher = new BSPatcher();
+                                                    patcher.OnProgress += delegate(object sender, long current, long total)
                                                     {
-                                                        lock (list_0)
-                                                        {
-                                                            list_0.Remove(class4.class96_0);
-                                                        }
-                                                        int_1++;
+                                                        downloadItem.Progress = ((float)current / total) * 100;
+                                                    };
+                                                    
+                                                    patcher.Patch(localFilename, localFilename + "_new", patchFilename, Compression.BZip2);
+                                                    File.Delete(patchFilename);
+                                                    
+                                                    localChecksum = GetMd5(localFilename + "_new");
+                                                    if (!patchFile.Contains(localChecksum))
+                                                    {
+                                                        lock (Files)
+                                                            Files.Remove(downloadItem);
+                                                        filesCompleted++;
                                                         break;
                                                     }
+                                                    
                                                     File.Delete(localFilename + "_diff");
-                                                    method_2(localFilename + "_new", localFilename);
-                                                    lock (list_0)
-                                                    {
-                                                        list_0.Remove(class4.class96_0);
-                                                    }
-                                                    int_1++;
+                                                    MoveFile(localFilename + "_new", localFilename);
+                                                    
+                                                    lock (Files)
+                                                        Files.Remove(downloadItem);
+                                                    filesCompleted++;
                                                 }
-                                                if (class2.string_0 == remoteChecksum)
+                                                
+                                                if (localChecksum == remoteChecksum)
                                                 {
-                                                    Class6.dictionary_0["h_" + localFilename] = class2.string_0;
+                                                    ConfigManagerCompact.Configuration["h_" + localFilename] = localChecksum;
                                                     continue;
                                                 }
                                             }
                                         }
-                                        catch (Exception ex2)
+                                        catch (Exception e)
                                         {
-                                            MessageBox.Show("error occured: " + ex2);
+                                            MessageBox.Show("error occured: " + e);
                                         }
                                     }
+                                    
                                     if (File.Exists(remoteFile.Replace('/', '\\') + "_new"))
                                     {
                                         File.Delete(remoteFile.Replace('/', '\\') + "_new");
                                     }
+                                    
                                     Class23 class6 = new Class23(remoteFile.Replace('/', '\\') + "_new", string_1 + remoteFile + "?v=" + remoteChecksum);
                                     lock (list_0)
                                     {
