@@ -24,6 +24,7 @@ namespace Updater
         
         static List<DownloadItem> Extras = new List<DownloadItem>();
         static List<DownloadItem> Files = new List<DownloadItem>();
+        static List<String> Checksums;
         
         private int autoStartTick = 0;
         private int filesCompleted = 0;
@@ -160,17 +161,19 @@ namespace Updater
                                     {
                                         try
                                         {
-                                            int num = 1;
-                                            if (list_1 == null)
+                                            int index = 1;
+                                            
+                                            if (Checksums == null)
                                             {
-                                                Class24 class3 = new Class24(string_0 + "patches.php");
-                                                list_1 = new List<string>(class3.method_0().Split(new char[1] { '\n' }));
+                                                StringNetRequest request = new StringNetRequest(primaryUpdateUrl + "patches.php");
+                                                Checksums = new List<string>(request.BlockingPerform().Split('\n'));
                                             }
-                                            if (list_1.Count > 0)
+                                            
+                                            if (Checksums.Count > 0)
                                             {
                                                 while (class2.string_0 != remoteChecksum)
                                                 {
-                                                    string text6 = list_1.Find(class2.method_0);
+                                                    string text6 = Checksums.Find(class2.method_0);
                                                     if (text6 == null)
                                                     {
                                                         break;
@@ -180,7 +183,7 @@ namespace Updater
                                                     class4.updater_0 = this;
                                                     string text7 = localFilename + "_patch";
                                                     class4.class23_0 = new Class23(text7, string_1 + text6);
-                                                    class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + num++ + ")", description, localFilename);
+                                                    class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + index++ + ")", description, localFilename);
                                                     lock (list_0)
                                                     {
                                                         list_0.Add(class4.class96_0);
