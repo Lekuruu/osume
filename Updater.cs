@@ -13,10 +13,11 @@ using ICSharpCode.SharpZipLib.Zip;
 using osu_common.Helpers;
 using osu_common.Libraries;
 using osu_common.Libraries.NetLib;
+using osu_common.Updater;
 
 namespace Updater
 {
-    public partial class Updater : Form
+    public partial class Updater : FormHelper
     {
         private string backupUpdateUrl = "http://osu.ppy.sh/release/";
         private string primaryUpdateUrl = "http://update.ppy.sh/release/";
