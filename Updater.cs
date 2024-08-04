@@ -60,33 +60,25 @@ namespace Updater
 
         public void CheckUpdates()
         {
-            MethodInvoker val = null;
-            MethodInvoker val2 = null;
-            MethodInvoker val3 = null;
+            CommonUpdater.Cleanup();
+            Invoke(delegate { this.statusUpdater.Start(); });
 
-            Class93.smethod_3();
-            Invoke(new MethodInvoker(method_7));
             if (!Directory.Exists("Songs"))
-            {
                 Directory.CreateDirectory("Songs");
-            }
-            if (Class6.dictionary_0.ContainsKey("u_UpdaterAutoStart"))
-            {
-                Invoke(new MethodInvoker(method_8));
-            }
+
+            if (ConfigManagerCompact.Configuration.ContainsKey("u_UpdaterAutoStart"))
+                Invoke(delegate { autoStart.Checked = ConfigManagerCompact.Configuration["u_UpdaterAutoStart"] == "1"; });
+
             try
             {
-                if (val == null)
-                {
-                    val = new MethodInvoker(method_9);
-                }
-                Invoke(val);
+                Invoke(delegate { this.changelogBrowser.Navigate("http://osu.ppy.sh/p/changelog?updater=" + (testBuild.Checked ? "2" : "1")); });
             }
             catch
             {
                 MessageBox.Show("Couldn't load changelog. It seems your IE6 install is corrupt.");
             }
-            if (Class102.smethod_1("osu!", 1) && (!File.Exists("osu!test.exe") || Class102.smethod_1("osu!test", 1)))
+
+            if (Program.KillProcess("osu!") && (!File.Exists("osu!test.exe") || Program.KillProcess("osu!test")))
             {
                 Invoke(new MethodInvoker(method_11));
                 string text;
