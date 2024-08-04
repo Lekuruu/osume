@@ -276,24 +276,26 @@ namespace Updater
                                 }
                             }
                         }
-                        bool_0 = true;
+                        
+                        checkedForUpdates = true;
                         return;
                     }
-                    catch (Exception ex3)
+                    catch (Exception e)
                     {
-                        MessageBox.Show("Error\n" + ex3);
+                        MessageBox.Show("Error\n" + e);
                         return;
                     }
                 }
+                
                 MessageBox.Show("An error occurred retrieving the latest update information");
             }
             else
             {
-                if (val2 == null)
+                Invoke(delegate
                 {
-                    val2 = new MethodInvoker(method_10);
-                }
-                Invoke(val2);
+                    MessageBox.Show(this, "Couldn't close osu!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Application.Exit();
+                });
             }
         }
 
@@ -338,7 +340,7 @@ namespace Updater
         {
             try
             {
-                if (!ConfigManagerCompact.Configuration.ContainsKey("h_" + filename))
+                if (!ConfigManagerCompact.Configuration.ContainsKey("h_" + filename) || filename == "osume.exe")
                     ConfigManagerCompact.Configuration["h_" + filename] = GetMd5(filename);
 
                 return ConfigManagerCompact.Configuration["h_" + filename]; 
@@ -350,7 +352,7 @@ namespace Updater
             }
         }
 
-        private string GetMd5(string filepath)
+        private static string GetMd5(string filepath)
         {
             try
             {
