@@ -252,9 +252,7 @@ namespace Updater
                                     }
                                     
                                     if (File.Exists(remoteFile.Replace('/', '\\') + "_new"))
-                                    {
                                         File.Delete(remoteFile.Replace('/', '\\') + "_new");
-                                    }
                                     
                                     Class23 class6 = new Class23(remoteFile.Replace('/', '\\') + "_new", string_1 + remoteFile + "?v=" + remoteChecksum);
                                     lock (list_0)
@@ -276,27 +274,27 @@ namespace Updater
                                         break;
                                     }
                                 }
+                            }
                         }
+                        bool_0 = true;
+                        return;
                     }
-                    bool_0 = true;
-                    return;
+                    catch (Exception ex3)
+                    {
+                        MessageBox.Show("Error\n" + ex3);
+                        return;
+                    }
                 }
-                catch (Exception ex3)
-                {
-                    MessageBox.Show("Error\n" + ex3);
-                    return;
-                }
+                MessageBox.Show("An error occurred retrieving the latest update information");
             }
-            MessageBox.Show("An error occurred retrieving the latest update information");
-        }
-        else
-        {
-            if (val2 == null)
+            else
             {
-                val2 = new MethodInvoker(method_10);
+                if (val2 == null)
+                {
+                    val2 = new MethodInvoker(method_10);
+                }
+                Invoke(val2);
             }
-            Invoke(val2);
-        }
         }
 
         public void StartGame()
