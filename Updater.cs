@@ -98,70 +98,63 @@ namespace Updater
                 {
                     try
                     {
-                        Delegate0 @delegate = method_12;
-                        ((Control)this).Invoke((Delegate)@delegate);
-                        string[] array = response.Split(new char[1] { '\n' });
-                        string[] array2 = array;
-                        foreach (string text2 in array2)
+                        base.Invoke(delegate { extrasTabWrapper.Enabled = true; });
+                        string[] lines = response.Split('\n');
+                        
+                        foreach (string line in lines)
                         {
-                            Class97 class2 = new Class97();
-                            if (text2.Length != 0)
+                            if (line.Length != 0)
                             {
-                                string[] array3 = text2.Split(new char[1] { ' ' });
-                                string text3 = array3[0];
-                                string text4 = array3[4].Replace('/', '\\');
-                                string string_ = array3[2].Replace('-', ' ');
-                                bool flag = false;
-                                if (array3.Length >= 4)
+                                string[] lineContents = line.Split(' ');
+                                string remoteFile = lineContents[0];
+                                string localFilename = lineContents[4].Replace('/', '\\');
+                                string description = lineContents[2].Replace('-', ' ');
+                                bool isDiff = false;
+                                
+                                if (lineContents.Length >= 4)
                                 {
-                                    bool flag2 = false;
-                                    string[] array4 = array3[3].Split(new char[1] { ',' });
-                                    for (int j = 0; j < array4.Length; j++)
+                                    bool isExtra = false;
+                                    string[] actions = lineContents[3].Split(new char[1] { ',' });
+                                    
+                                    foreach (string action in actions)
                                     {
-                                        switch (array4[j])
+                                        switch (action)
                                         {
-                                        case "extra":
-                                            if (!File.Exists(array3[4]))
-                                            {
-                                                if (text4 == "osu!test.exe")
+                                            case "extra":
+                                                if (!File.Exists(lineContents[4]))
                                                 {
-                                                    if (val3 == null)
-                                                    {
-                                                        val3 = new MethodInvoker(method_13);
-                                                    }
-                                                    Invoke(val3);
+                                                    if (localFilename == "osu!test.exe")
+                                                        Invoke(() => testBuild.Enabled = true);
+                                                    
+                                                    AddExtra(new DownloadItem(null, remoteFile, description, localFilename));
+                                                    isExtra = true;
                                                 }
-                                                method_5(new Class96(null, text3, string_, text4));
-                                                flag2 = true;
-                                            }
-                                            break;
-                                        case "diff":
-                                            flag = true;
-                                            break;
-                                        case "noup":
-                                        if (!File.Exists(text3))
-                                        {
-                                        }
-                                        break;
-                                    case "del":
-                                        if (File.Exists(text3))
-                                        {
-                                            File.Delete(text3);
-                                        }
-                                        break;
+                                                break;
+                                            case "diff":
+                                                isDiff = true;
+                                                break;
+                                            case "noup":
+                                                if (!File.Exists(remoteFile))
+                                                    continue;
+                                                break;
+                                            case "del":
+                                                if (File.Exists(remoteFile))
+                                                {
+                                                    File.Delete(remoteFile);
+                                                }
+                                                break;
                                     }
                                 }
-                                if (flag2)
-                                {
+                                if (isExtra)
                                     continue;
-                                }
                             }
-                            bool flag3 = File.Exists(text4);
-                            string text5 = array3[1];
-                            class2.string_0 = (flag3 ? smethod_0(text4) : string.Empty);
+                                
+                            bool flag3 = File.Exists(localFilename);
+                            string text5 = lineContents[1];
+                            class2.string_0 = (flag3 ? smethod_0(localFilename) : string.Empty);
                             if (!flag3 || !(class2.string_0 == text5))
                             {
-                                if (flag3 && flag)
+                                if (flag3 && isDiff)
                                 {
                                     try
                                     {
@@ -183,9 +176,9 @@ namespace Updater
                                                 Class98 class4 = new Class98();
                                                 class4.class97_0 = class2;
                                                 class4.updater_0 = this;
-                                                string text7 = text4 + "_patch";
+                                                string text7 = localFilename + "_patch";
                                                 class4.class23_0 = new Class23(text7, string_1 + text6);
-                                                class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + num++ + ")", string_, text4);
+                                                class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + num++ + ")", description, localFilename);
                                                 lock (list_0)
                                                 {
                                                     list_0.Add(class4.class96_0);
@@ -211,9 +204,9 @@ namespace Updater
                                                 class4.class96_0.double_0 = 0.0;
                                                 Class5 class5 = new Class5();
                                                 class5.method_0(class4.method_1);
-                                                class5.method_1(text4, text4 + "_new", text7, Enum1.const_1);
+                                                class5.method_1(localFilename, localFilename + "_new", text7, Enum1.const_1);
                                                 File.Delete(text7);
-                                                class2.string_0 = smethod_1(text4 + "_new");
+                                                class2.string_0 = smethod_1(localFilename + "_new");
                                                 if (!text6.Contains(class2.string_0))
                                                 {
                                                     lock (list_0)
@@ -223,8 +216,8 @@ namespace Updater
                                                     int_1++;
                                                     break;
                                                 }
-                                                File.Delete(text4 + "_diff");
-                                                method_2(text4 + "_new", text4);
+                                                File.Delete(localFilename + "_diff");
+                                                method_2(localFilename + "_new", localFilename);
                                                 lock (list_0)
                                                 {
                                                     list_0.Remove(class4.class96_0);
@@ -233,7 +226,7 @@ namespace Updater
                                             }
                                             if (class2.string_0 == text5)
                                             {
-                                                Class6.dictionary_0["h_" + text4] = class2.string_0;
+                                                Class6.dictionary_0["h_" + localFilename] = class2.string_0;
                                                 continue;
                                             }
                                         }
@@ -243,14 +236,14 @@ namespace Updater
                                         MessageBox.Show("error occured: " + ex2);
                                     }
                                 }
-                                if (File.Exists(text3.Replace('/', '\\') + "_new"))
+                                if (File.Exists(remoteFile.Replace('/', '\\') + "_new"))
                                 {
-                                    File.Delete(text3.Replace('/', '\\') + "_new");
+                                    File.Delete(remoteFile.Replace('/', '\\') + "_new");
                                 }
-                                Class23 class6 = new Class23(text3.Replace('/', '\\') + "_new", string_1 + text3 + "?v=" + text5);
+                                Class23 class6 = new Class23(remoteFile.Replace('/', '\\') + "_new", string_1 + remoteFile + "?v=" + text5);
                                 lock (list_0)
                                 {
-                                    list_0.Add(new Class96(class6, text3.Replace('/', '\\'), string_, text4));
+                                    list_0.Add(new Class96(class6, remoteFile.Replace('/', '\\'), description, localFilename));
                                 }
                                 int_2++;
                                 class6.method_1(method_4);
@@ -262,7 +255,7 @@ namespace Updater
                                     class6.vmethod_0();
                                 }
                                 while (class6.string_0 != empty);
-                                if (text3 == "_osume.exe")
+                                if (remoteFile == "_osume.exe")
                                 {
                                     break;
                                 }
@@ -347,6 +340,12 @@ namespace Updater
                 MessageBox.Show("Error\n" + ex);
                 return "fail";
             }
+        }
+
+        private void AddExtra(DownloadItem item)
+        {
+            Extras.Add(item);
+            Invoke(() => { extrasCheckBoxList.Items.Add(item); });
         }
 
         private void OnLoad(object sender, EventArgs e)
