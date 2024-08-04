@@ -171,48 +171,53 @@ namespace Updater
                                             
                                             if (Checksums.Count > 0)
                                             {
-                                                while (class2.string_0 != remoteChecksum)
+                                                while (localChecksum != remoteChecksum)
                                                 {
-                                                    string text6 = Checksums.Find(class2.method_0);
-                                                    if (text6 == null)
-                                                    {
+                                                    string patchFile = Checksums.Find(item => item.Contains(localChecksum + "_"));
+                                                    
+                                                    if (patchFile == null)
                                                         break;
-                                                    }
-                                                    Class98 class4 = new Class98();
-                                                    class4.class97_0 = class2;
-                                                    class4.updater_0 = this;
-                                                    string text7 = localFilename + "_patch";
-                                                    class4.class23_0 = new Class23(text7, string_1 + text6);
-                                                    class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + index++ + ")", description, localFilename);
-                                                    lock (list_0)
+                                                    
+                                                    string patchFilename = localFilename + "_patch";
+                                                    FileNetRequest request = new FileNetRequest(patchFilename, backupUpdateUrl + patchFile);
+                                                    DownloadItem item = new DownloadItem(request, patchFilename + " (" + index++ + ")", description, localFilename);
+                                                    
+                                                    lock (Files)
+                                                        Files.Add(item);
+                                                    
+                                                    filesProcessing++;
+                                                    request.onUpdate += OnDownloadUpdated;
+                                                    request.onFinish += delegate(string path, Exception e)
                                                     {
-                                                        list_0.Add(class4.class96_0);
-                                                    }
-                                                    int_2++;
-                                                    class4.class23_0.method_0(method_3);
-                                                    class4.class23_0.method_1(class4.method_0);
-                                                    int num2 = 3;
-                                                    while (num2-- > 0)
+                                                        if (e != null)
+                                                            request.m_url = request.m_url.Replace(backupUpdateUrl, primaryUpdateUrl);
+                                                    };
+                                                    
+                                                    int retries = 3;
+                                                    while (retries-- > 0)
                                                     {
-                                                        class4.class23_0.vmethod_0();
-                                                        if (File.Exists(text7))
-                                                        {
+                                                        request.Perform();
+                                                        
+                                                        if (File.Exists(patchFilename))
                                                             break;
-                                                        }
+                                                        
                                                         Thread.Sleep(1000);
                                                     }
-                                                    if (!File.Exists(text7))
+                                                    
+                                                    if (!File.Exists(patchFilename))
                                                     {
-                                                        MessageBox.Show("Unable to download " + text7 + ". Please check your connection and/or try again later");
+                                                        MessageBox.Show("Unable to download " + patchFilename + ". Please check your connection and/or try again later");
                                                     }
-                                                    class4.class96_0.bool_0 = true;
-                                                    class4.class96_0.double_0 = 0.0;
+                                                    
+                                                    item.Patching = true;
+                                                    item.Progress = 0.0;
+                                                    
                                                     Class5 class5 = new Class5();
                                                     class5.method_0(class4.method_1);
-                                                    class5.method_1(localFilename, localFilename + "_new", text7, Enum1.const_1);
-                                                    File.Delete(text7);
+                                                    class5.method_1(localFilename, localFilename + "_new", patchFilename, Enum1.const_1);
+                                                    File.Delete(patchFilename);
                                                     class2.string_0 = smethod_1(localFilename + "_new");
-                                                    if (!text6.Contains(class2.string_0))
+                                                    if (!patchFile.Contains(class2.string_0))
                                                     {
                                                         lock (list_0)
                                                         {
