@@ -59,7 +59,240 @@ namespace Updater
 
         public void CheckUpdates()
         {
-            // TODO: ...
+            MethodInvoker val = null;
+            MethodInvoker val2 = null;
+            MethodInvoker val3 = null;
+
+            Class93.smethod_3();
+            Invoke(new MethodInvoker(method_7));
+            if (!Directory.Exists("Songs"))
+            {
+                Directory.CreateDirectory("Songs");
+            }
+            if (Class6.dictionary_0.ContainsKey("u_UpdaterAutoStart"))
+            {
+                Invoke(new MethodInvoker(method_8));
+            }
+            try
+            {
+                if (val == null)
+                {
+                    val = new MethodInvoker(method_9);
+                }
+                Invoke(val);
+            }
+            catch
+            {
+                MessageBox.Show("Couldn't load changelog. It seems your IE6 install is corrupt.");
+            }
+            if (Class102.smethod_1("osu!", 1) && (!File.Exists("osu!test.exe") || Class102.smethod_1("osu!test", 1)))
+            {
+                Invoke(new MethodInvoker(method_11));
+                string text;
+                try
+                {
+                    Class24 @class = new Class24(string_0 + "update?time=" + DateTime.Now.Ticks);
+                    text = @class.method_0();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error occurred retrieving the latest update information:\n" + ex);
+                    return;
+                }
+                if (text.Length != 0)
+                {
+                    try
+                    {
+                        Delegate0 @delegate = method_12;
+                        ((Control)this).Invoke((Delegate)@delegate);
+                        string[] array = text.Split(new char[1] { '\n' });
+                        string[] array2 = array;
+                        foreach (string text2 in array2)
+                        {
+                            Class97 class2 = new Class97();
+                            if (text2.Length != 0)
+                            {
+                                string[] array3 = text2.Split(new char[1] { ' ' });
+                                string text3 = array3[0];
+                                string text4 = array3[4].Replace('/', '\\');
+                                string string_ = array3[2].Replace('-', ' ');
+                                bool flag = false;
+                                if (array3.Length >= 4)
+                                {
+                                    bool flag2 = false;
+                                    string[] array4 = array3[3].Split(new char[1] { ',' });
+                                    for (int j = 0; j < array4.Length; j++)
+                                    {
+                                        switch (array4[j])
+                                        {
+                                        case "extra":
+                                            if (!File.Exists(array3[4]))
+                                            {
+                                                if (text4 == "osu!test.exe")
+                                                {
+                                                    if (val3 == null)
+                                                    {
+                                                        val3 = new MethodInvoker(method_13);
+                                                    }
+                                                    Invoke(val3);
+                                                }
+                                                method_5(new Class96(null, text3, string_, text4));
+                                                flag2 = true;
+                                            }
+                                            break;
+                                        case "diff":
+                                            flag = true;
+                                            break;
+                                        case "noup":
+                                        if (!File.Exists(text3))
+                                        {
+                                        }
+                                        break;
+                                    case "del":
+                                        if (File.Exists(text3))
+                                        {
+                                            File.Delete(text3);
+                                        }
+                                        break;
+                                    }
+                                }
+                                if (flag2)
+                                {
+                                    continue;
+                                }
+                            }
+                            bool flag3 = File.Exists(text4);
+                            string text5 = array3[1];
+                            class2.string_0 = (flag3 ? smethod_0(text4) : string.Empty);
+                            if (!flag3 || !(class2.string_0 == text5))
+                            {
+                                if (flag3 && flag)
+                                {
+                                    try
+                                    {
+                                        int num = 1;
+                                        if (list_1 == null)
+                                        {
+                                            Class24 class3 = new Class24(string_0 + "patches.php");
+                                            list_1 = new List<string>(class3.method_0().Split(new char[1] { '\n' }));
+                                        }
+                                        if (list_1.Count > 0)
+                                        {
+                                            while (class2.string_0 != text5)
+                                            {
+                                                string text6 = list_1.Find(class2.method_0);
+                                                if (text6 == null)
+                                                {
+                                                    break;
+                                                }
+                                                Class98 class4 = new Class98();
+                                                class4.class97_0 = class2;
+                                                class4.updater_0 = this;
+                                                string text7 = text4 + "_patch";
+                                                class4.class23_0 = new Class23(text7, string_1 + text6);
+                                                class4.class96_0 = new Class96(class4.class23_0, text7 + " (" + num++ + ")", string_, text4);
+                                                lock (list_0)
+                                                {
+                                                    list_0.Add(class4.class96_0);
+                                                }
+                                                int_2++;
+                                                class4.class23_0.method_0(method_3);
+                                                class4.class23_0.method_1(class4.method_0);
+                                                int num2 = 3;
+                                                while (num2-- > 0)
+                                                {
+                                                    class4.class23_0.vmethod_0();
+                                                    if (File.Exists(text7))
+                                                    {
+                                                        break;
+                                                    }
+                                                    Thread.Sleep(1000);
+                                                }
+                                                if (!File.Exists(text7))
+                                                {
+                                                    MessageBox.Show("Unable to download " + text7 + ". Please check your connection and/or try again later");
+                                                }
+                                                class4.class96_0.bool_0 = true;
+                                                class4.class96_0.double_0 = 0.0;
+                                                Class5 class5 = new Class5();
+                                                class5.method_0(class4.method_1);
+                                                class5.method_1(text4, text4 + "_new", text7, Enum1.const_1);
+                                                File.Delete(text7);
+                                                class2.string_0 = smethod_1(text4 + "_new");
+                                                if (!text6.Contains(class2.string_0))
+                                                {
+                                                    lock (list_0)
+                                                    {
+                                                        list_0.Remove(class4.class96_0);
+                                                    }
+                                                    int_1++;
+                                                    break;
+                                                }
+                                                File.Delete(text4 + "_diff");
+                                                method_2(text4 + "_new", text4);
+                                                lock (list_0)
+                                                {
+                                                    list_0.Remove(class4.class96_0);
+                                                }
+                                                int_1++;
+                                            }
+                                            if (class2.string_0 == text5)
+                                            {
+                                                Class6.dictionary_0["h_" + text4] = class2.string_0;
+                                                continue;
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex2)
+                                    {
+                                        MessageBox.Show("error occured: " + ex2);
+                                    }
+                                }
+                                if (File.Exists(text3.Replace('/', '\\') + "_new"))
+                                {
+                                    File.Delete(text3.Replace('/', '\\') + "_new");
+                                }
+                                Class23 class6 = new Class23(text3.Replace('/', '\\') + "_new", string_1 + text3 + "?v=" + text5);
+                                lock (list_0)
+                                {
+                                    list_0.Add(new Class96(class6, text3.Replace('/', '\\'), string_, text4));
+                                }
+                                int_2++;
+                                class6.method_1(method_4);
+                                class6.method_0(method_3);
+                                string empty = string.Empty;
+                                do
+                                {
+                                    empty = class6.string_0;
+                                    class6.vmethod_0();
+                                }
+                                while (class6.string_0 != empty);
+                                if (text3 == "_osume.exe")
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    bool_0 = true;
+                    return;
+                }
+                catch (Exception ex3)
+                {
+                    MessageBox.Show("Error\n" + ex3);
+                    return;
+                }
+            }
+            MessageBox.Show("An error occurred retrieving the latest update information");
+        }
+        else
+        {
+            if (val2 == null)
+            {
+                val2 = new MethodInvoker(method_10);
+            }
+            Invoke(val2);
+        }
         }
 
         public void StartGame()
@@ -71,54 +304,54 @@ namespace Updater
         
         private void MoveFile(string sourcePath, string dstPath)
         {
-	        int retries = 5;
-	        
-	        while (retries-- > 0)
-	        {
-		        try { File.Delete(dstPath); }
-		        catch { }
-		        
-		        try 
-		        {
-			        File.Move(sourcePath, dstPath);
-			        return;
-		        }
-		        catch
-		        {
-			        try
-			        {
-				        File.Copy(sourcePath, dstPath, true);
-				        File.Delete(sourcePath);
-				        return;
-			        }
-			        catch { }
-		        }
-		        Thread.Sleep(600);
-	        }
-	        MessageBox.Show("Unable to relpace file " + dstPath + ". Please check this file isn't still open then try running the updater again.");
-	        Environment.Exit(-1);
+            int retries = 5;
+
+            while (retries-- > 0)
+            {
+                try { File.Delete(dstPath); }
+                catch { }
+
+                try
+                {
+                    File.Move(sourcePath, dstPath);
+                    return;
+                }
+                catch
+                {
+                    try
+                    {
+                        File.Copy(sourcePath, dstPath, true);
+                        File.Delete(sourcePath);
+                        return;
+                    }
+                    catch { }
+                }
+                Thread.Sleep(600);
+            }
+            MessageBox.Show("Unable to relpace file " + dstPath + ". Please check this file isn't still open then try running the updater again.");
+            Environment.Exit(-1);
         }
 
         private string GetMd5(string filepath)
         {
-	        try
-	        {
-		        Stream stream = File.Open(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
-		        MD5 md5 = MD5.Create();
-		        byte[] array = md5.ComputeHash(stream);
-		        StringBuilder sb = new StringBuilder();
-		        for (int i = 0; i < array.Length; i++)
-		        {
-			        sb.Append(array[i].ToString("x2"));
-		        }
-		        stream.Close();
-		        return sb.ToString();
-	        }
-	        catch (Exception ex)
-	        {
-		        MessageBox.Show("Error\n" + ex);
-		        return "fail";
-	        }
+            try
+            {
+                Stream stream = File.Open(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                MD5 md5 = MD5.Create();
+                byte[] array = md5.ComputeHash(stream);
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    sb.Append(array[i].ToString("x2"));
+                }
+                stream.Close();
+                return sb.ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error\n" + ex);
+                return "fail";
+            }
         }
 
         private void OnLoad(object sender, EventArgs e)
@@ -153,216 +386,216 @@ namespace Updater
         private void OnStatusUpdateTick(object sender, EventArgs e)
         {
             try
-			{
-				if (this.extrasCheckBoxList.SelectedItems.Count > 0)
-				{
-					DownloadItem item = (DownloadItem)this.extrasCheckBoxList.Items[
-						this.extrasCheckBoxList.SelectedIndex
-					];
-					
-					if (item == null)
-						return;
-					
-					if (File.Exists(item.Filename + "_new"))
-						File.Delete(item.Filename + "_new");
-					
-					FileNetRequest nr = new FileNetRequest(
-						item.Filename + "_new",
-						primaryUpdateUrl + item.Filename
-					);
-					
-					item.NetRequest = nr;
-					
-					lock (Files)
-						Files.Add(item);
-					
-					nr.onFinish += OnDownloadFinished;
-					nr.onUpdate += OnDownloadUpdated;
-					
-					NetManager.AddRequest(nr);
-					this.filesProcessing++;
-					
-					if (this.extrasCheckBoxList.Items.Contains(item))
-						this.extrasCheckBoxList.Items.Remove(item);
-					
-					this.extrasCheckBoxList.SelectedItems.Clear();
-				}
-				if (this.filesProcessing == this.filesCompleted)
-				{
-					if (!checkedForUpdates)
-					{
-						this.statusText.Text = "Checking for updates...";
-						this.buttonStart.Visible = false;
-					}
-					else
-					{
-						if (this.statusText.Text != "All done!")
-						{
-							this.statusText.Text = "All done!";
-							this.buttonStart.Visible = true;
-							this.filesCompleted = 0;
-							this.filesProcessing = 0;
-							
-							if (File.Exists("osu!test.exe"))
-								this.testBuild.Text = "Use test build";
-							
-							this.buttonStart.Focus();
-						}
-						if (
-							autoStart.Checked &&
-							extrasTabWrapper.SelectedIndex != 1 &&
-							!extraTabVisible &&
-							autoStartTick++ > 10
-						)
-							StartGame();
-					}
-				}
-				else
-				{
-					lock (Files)
-					{
-						if (Files.Count <= 0)
-							return;
-						
-						buttonStart.Visible = false;
-						if (Files[0].Patching)
-						{
-							this.statusText.Text = string.Format(
-								"Patching {0}... {1:0}%",
-								Files[0].Filename,
-								Files[0].Progress
-							);
-						}
-						else
-						{
-							this.statusText.Text = string.Format(
-								"Downloading {3} {2:0}%", new object[]
-								{
-									this.filesCompleted + 1,
-									this.filesProcessing,
-									Files[0].Progress,
-									Files[0].Filename
-								}
-							);
-						}
-						
-						progressBar.Style = ProgressBarStyle.Continuous;
-						int newProgress = (int)Files[0].Progress;
+            {
+                if (this.extrasCheckBoxList.SelectedItems.Count > 0)
+                {
+                    DownloadItem item = (DownloadItem)this.extrasCheckBoxList.Items[
+                        this.extrasCheckBoxList.SelectedIndex
+                    ];
 
-						if (newProgress >= 0 && newProgress <= 100)
-							progressBar.Value = newProgress;
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.ToString());
-			}
+                    if (item == null)
+                        return;
+
+                    if (File.Exists(item.Filename + "_new"))
+                        File.Delete(item.Filename + "_new");
+
+                    FileNetRequest nr = new FileNetRequest(
+                        item.Filename + "_new",
+                        primaryUpdateUrl + item.Filename
+                    );
+
+                    item.NetRequest = nr;
+
+                    lock (Files)
+                        Files.Add(item);
+
+                    nr.onFinish += OnDownloadFinished;
+                    nr.onUpdate += OnDownloadUpdated;
+
+                    NetManager.AddRequest(nr);
+                    this.filesProcessing++;
+
+                    if (this.extrasCheckBoxList.Items.Contains(item))
+                        this.extrasCheckBoxList.Items.Remove(item);
+
+                    this.extrasCheckBoxList.SelectedItems.Clear();
+                }
+                if (this.filesProcessing == this.filesCompleted)
+                {
+                    if (!checkedForUpdates)
+                    {
+                        this.statusText.Text = "Checking for updates...";
+                        this.buttonStart.Visible = false;
+                    }
+                    else
+                    {
+                        if (this.statusText.Text != "All done!")
+                        {
+                            this.statusText.Text = "All done!";
+                            this.buttonStart.Visible = true;
+                            this.filesCompleted = 0;
+                            this.filesProcessing = 0;
+
+                            if (File.Exists("osu!test.exe"))
+                                this.testBuild.Text = "Use test build";
+
+                            this.buttonStart.Focus();
+                        }
+                        if (
+                            autoStart.Checked &&
+                            extrasTabWrapper.SelectedIndex != 1 &&
+                            !extraTabVisible &&
+                            autoStartTick++ > 10
+                        )
+                            StartGame();
+                    }
+                }
+                else
+                {
+                    lock (Files)
+                    {
+                        if (Files.Count <= 0)
+                            return;
+
+                        buttonStart.Visible = false;
+                        if (Files[0].Patching)
+                        {
+                            this.statusText.Text = string.Format(
+                                "Patching {0}... {1:0}%",
+                                Files[0].Filename,
+                                Files[0].Progress
+                            );
+                        }
+                        else
+                        {
+                            this.statusText.Text = string.Format(
+                                "Downloading {3} {2:0}%", new object[]
+                                {
+                                    this.filesCompleted + 1,
+                                    this.filesProcessing,
+                                    Files[0].Progress,
+                                    Files[0].Filename
+                                }
+                            );
+                        }
+
+                        progressBar.Style = ProgressBarStyle.Continuous;
+                        int newProgress = (int)Files[0].Progress;
+
+                        if (newProgress >= 0 && newProgress <= 100)
+                            progressBar.Value = newProgress;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void OnDownloadFinished(string location, Exception e)
         {
-	        string filename = location.Replace("_new", "");
-	        
-	        DownloadItem item = Files.Find(i => i.Filename == filename);
+            string filename = location.Replace("_new", "");
 
-	        if (e != null)
-	        {
-		        if (item.NetRequest.m_url.Contains(primaryUpdateUrl))
-		        {
-			        item.NetRequest.m_url = item.NetRequest.m_url.Replace(primaryUpdateUrl, backupUpdateUrl);
-			        return;
-		        }
-	        
-		        MessageBox.Show(
-			        string.Format(
-				        "An error was encountered while downloading the file: {0}\n\nPlease restart the updater and report this error.\n{1}",
-				        location, e.ToString()
-			        )
-		        );
-		        return;
-	        }
+            DownloadItem item = Files.Find(i => i.Filename == filename);
 
-	        try
-	        {
-		        if (item == null)
-		        {
-			        MessageBox.Show(
-				        string.Format(
-					        "Internal error on file:{0}\n\nPlease restart the updater and report this error.",
-					        filename
-				        )
-			        );
-		        }
-		        else
-		        {
-			        if (File.Exists(filename))
-				        File.Delete(filename);
+            if (e != null)
+            {
+                if (item.NetRequest.m_url.Contains(primaryUpdateUrl))
+                {
+                    item.NetRequest.m_url = item.NetRequest.m_url.Replace(primaryUpdateUrl, backupUpdateUrl);
+                    return;
+                }
 
-			        MoveFile(location, filename);
+                MessageBox.Show(
+                    string.Format(
+                        "An error was encountered while downloading the file: {0}\n\nPlease restart the updater and report this error.\n{1}",
+                        location, e.ToString()
+                    )
+                );
+                return;
+            }
 
-			        if (Path.GetExtension(filename) == ".zip")
-			        {
-				        if (File.Exists(item.CheckFilename))
-					        File.Delete(item.CheckFilename);
+            try
+            {
+                if (item == null)
+                {
+                    MessageBox.Show(
+                        string.Format(
+                            "Internal error on file:{0}\n\nPlease restart the updater and report this error.",
+                            filename
+                        )
+                    );
+                }
+                else
+                {
+                    if (File.Exists(filename))
+                        File.Delete(filename);
 
-				        new FastZip().ExtractZip(
-					        filename,
-					        ".\\",
-					        FastZip.Overwrite.Always,
-					        null,
-					        ".*",
-					        ".*",
-					        false
-				        );
+                    MoveFile(location, filename);
 
-				        File.Delete(filename);
-			        }
+                    if (Path.GetExtension(filename) == ".zip")
+                    {
+                        if (File.Exists(item.CheckFilename))
+                            File.Delete(item.CheckFilename);
 
-			        if (filename == "_osume.exe")
-			        {
-				        Process.Start("_osume.exe");
-				        Application.Exit();
-			        }
-			        else
-			        {
-				        ConfigManagerCompact.Configuration["h_" + filename] = GetMd5(filename);
+                        new FastZip().ExtractZip(
+                            filename,
+                            ".\\",
+                            FastZip.Overwrite.Always,
+                            null,
+                            ".*",
+                            ".*",
+                            false
+                        );
 
-				        lock (Files)
-					        Files.Remove(item);
+                        File.Delete(filename);
+                    }
 
-				        this.filesCompleted++;
-			        }
-		        }
-	        }
-	        catch (Exception ex)
-	        {
-		        MessageBox.Show(
-			        string.Format(
-				        "An error was encountered while downloading the file:{0}\n\nPlease report this error:\n{1}",
-				        location,
-				        ex
-			        )
-		        );
-	        }
+                    if (filename == "_osume.exe")
+                    {
+                        Process.Start("_osume.exe");
+                        Application.Exit();
+                    }
+                    else
+                    {
+                        ConfigManagerCompact.Configuration["h_" + filename] = GetMd5(filename);
+
+                        lock (Files)
+                            Files.Remove(item);
+
+                        this.filesCompleted++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    string.Format(
+                        "An error was encountered while downloading the file:{0}\n\nPlease report this error:\n{1}",
+                        location,
+                        ex
+                    )
+                );
+            }
         }
 
         private void OnDownloadUpdated(object sender, long current, long total)
         {
-	        try
-	        {
-		        DownloadItem item = Files.Find(i => i.NetRequest == sender);
+            try
+            {
+                DownloadItem item = Files.Find(i => i.NetRequest == sender);
 
-		        if (item != null)
-		        {
-			        progress = (float)current / total * 100;
-			        item.Progress = progress;
-		        }
-	        }
-	        catch (Exception ex)
-	        {
-		        MessageBox.Show("Error\n" + ex);
-	        }
+                if (item != null)
+                {
+                    progress = (float)current / total * 100;
+                    item.Progress = progress;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error\n" + ex);
+            }
         }
 
         private void OnBrowserNavigating(object sender, WebBrowserNavigatingEventArgs e)
